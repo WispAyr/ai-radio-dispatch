@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.venv/
+
+# Audio recordings (generated at runtime)
+recordings/*.wav
+
+# Models (downloaded at runtime)
+*.bin
+*.pt
+
+# Whisper model cache
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Voices (downloaded at runtime)
+voices/

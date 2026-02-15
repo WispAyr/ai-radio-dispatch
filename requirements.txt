@@ -1,0 +1,6 @@
+sounddevice
+faster-whisper
+piper-tts
+aiohttp
+aiohttp-cors
+numpy
