@@ -12,6 +12,14 @@ venv/
 # Audio recordings (generated at runtime)
 recordings/*.wav
 
+# Database (generated at runtime)
+*.db
+*.db-shm
+*.db-wal
+
+# Channel config (generated at runtime)
+channels.json
+
 # Models (downloaded at runtime)
 *.bin
 *.pt

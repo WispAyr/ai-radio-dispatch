@@ -5,190 +5,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispatch Console</title>
+    <meta name="description"
+        content="Multi-channel radio dispatch monitoring console with real-time transcription and callsign tracking">
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
-    <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                            <path d="M2 17l10 5 10-5" />
-                            <path d="M2 12l10 5 10-5" />
-                        </svg>
-                    </div>
-                    <h1>DISPATCH CONSOLE</h1>
-                </div>
-                <div class="status-badge" id="statusBadge">
-                    <span class="status-dot"></span>
-                    <span class="status-text">OFFLINE</span>
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">📡</span>
+                <h1>DISPATCH CONSOLE</h1>
             </div>
-            <div class="header-right">
-                <div class="clock" id="clock">--:--:--</div>
+            <div class="status-badge" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">IDLE</span>
             </div>
-        </header>
+        </div>
+        <div class="header-right">
+            <div class="stats-bar" id="stats-bar">
+                <span class="stat-item" title="Total transcripts"><span class="stat-icon">📝</span> <span
+                        id="stat-transcripts">0</span></span>
+                <span class="stat-item" title="Active callsigns"><span class="stat-icon">📻</span> <span
+                        id="stat-callsigns">0</span></span>
+                <span class="stat-item" title="Bookmarks"><span class="stat-icon">🔖</span> <span
+                        id="stat-bookmarks">0</span></span>
+            </div>
+            <div class="clock" id="clock"></div>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="main">
-            <!-- Left Panel: Transcript -->
-            <section class="transcript-panel">
-                <div class="panel-header">
-                    <h2>LIVE TRANSCRIPT</h2>
-                    <span class="entry-count" id="entryCount">0 entries</span>
-                </div>
-                <div class="transcript" id="transcript">
-                    <div class="transcript-empty">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5" opacity="0.3">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                            <line x1="12" y1="19" x2="12" y2="23" />
-                            <line x1="8" y1="23" x2="16" y2="23" />
-                        </svg>
-                        <p>Waiting for audio...</p>
-                        <p class="hint">Click START to begin transcribing</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Right Panel: Controls & Info -->
-            <aside class="control-panel">
-                <!-- Audio Level -->
-                <div class="card">
-                    <h3>AUDIO LEVEL</h3>
-                    <div class="level-meter">
-                        <div class="level-bar-container">
-                            <div class="level-bar" id="levelBar"></div>
-                        </div>
-                        <div class="level-labels">
-                            <span>-60dB</span>
-                            <span>-30dB</span>
-                            <span>0dB</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Controls -->
-                <div class="card">
-                    <h3>CONTROLS</h3>
-                    <div class="controls">
-                        <button class="btn btn-start" id="btnStart" onclick="startDispatch()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            START
-                        </button>
-                        <button class="btn btn-stop" id="btnStop" onclick="stopDispatch()" disabled>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <rect x="6" y="4" width="4" height="16" />
-                                <rect x="14" y="4" width="4" height="16" />
-                            </svg>
-                            STOP
-                        </button>
-                        <button class="btn btn-mute" id="btnMute" onclick="toggleMute()" disabled>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                            </svg>
-                            <span id="muteText">MUTE</span>
-                        </button>
-                        <button class="btn btn-clear" onclick="clearLog()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polyline points="3 6 5 6 21 6" />
-                                <path
-                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                            CLEAR
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Audio Source -->
-                <div class="card">
-                    <h3>AUDIO SOURCE</h3>
-                    <select class="device-select" id="deviceSelect" onchange="switchDevice(this.value)">
-                        <option value="">Loading devices...</option>
-                    </select>
-                </div>
-
-                <!-- Speakers Legend -->
-                <div class="card" id="speakersCard" style="display:none;">
-                    <h3>SPEAKERS</h3>
-                    <div class="speakers-legend" id="speakersLegend"></div>
-                </div>
-
-                <!-- Transcription Settings -->
-                <div class="card">
-                    <h3>TRANSCRIPTION</h3>
-                    <div class="settings-group">
-                        <div class="setting-row">
-                            <label class="setting-label" for="modelSelect">Model</label>
-                            <select class="device-select" id="modelSelect"
-                                onchange="updateSetting('model', this.value)">
-                                <option value="tiny.en">tiny.en (39MB) — Fastest</option>
-                                <option value="base.en">base.en (139MB) — Fast</option>
-                                <option value="small.en">small.en (461MB) — Good</option>
-                                <option value="medium.en" selected>medium.en (1.5GB) — Great</option>
-                                <option value="large-v3">large-v3 (3.1GB) — Best</option>
-                            </select>
-                        </div>
-                        <div class="setting-row">
-                            <label class="setting-label">Beam Size <span class="setting-value"
-                                    id="beamValue">5</span></label>
-                            <input type="range" class="setting-slider" id="beamSize" min="1" max="10" value="5"
-                                onchange="updateSetting('beam_size', parseInt(this.value))">
-                        </div>
-                        <div class="setting-row">
-                            <label class="setting-label">VAD Threshold <span class="setting-value"
-                                    id="vadThreshValue">0.02</span></label>
-                            <input type="range" class="setting-slider" id="vadThreshold" min="0.005" max="0.1"
-                                step="0.005" value="0.02"
-                                onchange="updateSetting('vad_threshold', parseFloat(this.value))">
-                        </div>
-                        <div class="setting-row">
-                            <label class="setting-label">Silence Duration <span class="setting-value"
-                                    id="vadSilenceValue">1.5s</span></label>
-                            <input type="range" class="setting-slider" id="vadSilence" min="0.5" max="5" step="0.1"
-                                value="1.5" onchange="updateSetting('vad_silence', parseFloat(this.value))">
-                        </div>
-                    </div>
-                    <div id="modelStatus" class="model-status"></div>
-                </div>
-
-                <!-- System Info -->
-                <div class="card">
-                    <h3>SYSTEM</h3>
-                    <div class="sys-info">
-                        <div class="sys-row">
-                            <span class="sys-label">Mode</span>
-                            <span class="sys-value" id="sysMode">Transcription</span>
-                        </div>
-                        <div class="sys-row">
-                            <span class="sys-label">STT</span>
-                            <span class="sys-value" id="sysModel">faster-whisper</span>
-                        </div>
-                        <div class="sys-row">
-                            <span class="sys-label">WebSocket</span>
-                            <span class="sys-value" id="wsStatus">Disconnected</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </main>
+    <!-- Channel Tabs -->
+    <div class="channel-tabs" id="channel-tabs">
+        <button class="channel-tab active" data-channel="all">ALL</button>
     </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Transcript Panel -->
+        <div class="transcript-panel">
+            <!-- Search Bar -->
+            <div class="search-bar" id="search-bar">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Search transcripts..." autocomplete="off">
+                    <button class="search-clear" id="search-clear" title="Clear search">&times;</button>
+                </div>
+                <div class="search-filters" id="search-filters">
+                    <select id="filter-channel" class="filter-select">
+                        <option value="">All Channels</option>
+                    </select>
+                    <select id="filter-speaker" class="filter-select">
+                        <option value="">All Speakers</option>
+                    </select>
+                    <label class="filter-check">
+                        <input type="checkbox" id="filter-flagged"> Flagged only
+                    </label>
+                </div>
+            </div>
+
+            <!-- Transcript Content -->
+            <div class="transcript-content" id="transcript">
+                <div class="empty-state">
+                    <div class="empty-icon">📡</div>
+                    <p>Waiting for transmissions...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="sidebar">
+            <!-- Channel Level Bars -->
+            <div class="card" id="level-card">
+                <h3>Audio Levels</h3>
+                <div id="channel-levels"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="card">
+                <h3>Controls</h3>
+                <div class="control-buttons">
+                    <button id="btn-start" class="btn btn-primary" onclick="startAll()">▶ Start All</button>
+                    <button id="btn-stop" class="btn btn-danger" onclick="stopAll()">⏹ Stop All</button>
+                    <button id="btn-mute" class="btn btn-secondary" onclick="toggleMute()">🔇 Mute</button>
+                    <button id="btn-clear" class="btn btn-secondary" onclick="clearAll()">🗑 Clear</button>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-sm" onclick="exportData('json')">📥 JSON</button>
+                    <button class="btn btn-sm" onclick="exportData('csv')">📥 CSV</button>
+                    <button class="btn btn-sm" onclick="exportData('txt')">📥 TXT</button>
+                </div>
+            </div>
+
+            <!-- Callsign Registry -->
+            <div class="card" id="callsign-card">
+                <h3>Callsign Registry <span class="badge" id="callsign-count">0</span></h3>
+                <div class="callsign-list" id="callsign-list">
+                    <div class="empty-hint">No callsigns detected yet</div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="card" id="alerts-card">
+                <h3>Alerts</h3>
+                <div class="alert-add">
+                    <input type="text" id="alert-pattern" placeholder="Keyword or pattern..." class="alert-input">
+                    <label class="filter-check">
+                        <input type="checkbox" id="alert-regex"> Regex
+                    </label>
+                    <button class="btn btn-sm btn-primary" onclick="addAlert()">+ Add</button>
+                </div>
+                <div class="alert-list" id="alert-list">
+                    <div class="empty-hint">No alerts configured</div>
+                </div>
+            </div>
+
+            <!-- Bookmarks -->
+            <div class="card" id="bookmarks-card">
+                <h3>Bookmarks <span class="badge" id="bookmark-count">0</span></h3>
+                <div class="bookmark-list" id="bookmark-list">
+                    <div class="empty-hint">No bookmarks yet — click ★ on any entry</div>
+                </div>
+            </div>
+
+            <!-- Channel Management -->
+            <div class="card">
+                <h3>Channels</h3>
+                <div id="channel-management"></div>
+                <button class="btn btn-sm btn-primary" onclick="addChannel()" style="margin-top: 8px; width: 100%;">+
+                    Add Channel</button>
+            </div>
+
+            <!-- Transcription Settings -->
+            <div class="card collapsible">
+                <h3 class="card-toggle" onclick="toggleCard(this)">⚙ Settings <span class="toggle-icon">▸</span></h3>
+                <div class="card-body collapsed">
+                    <div class="setting-row">
+                        <label>Model</label>
+                        <select id="setting-model" class="setting-select" onchange="applySettings()">
+                            <option value="tiny.en">tiny.en (fastest)</option>
+                            <option value="base.en">base.en</option>
+                            <option value="small.en">small.en</option>
+                            <option value="medium.en">medium.en</option>
+                            <option value="large-v3">large-v3 (best)</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label>Beam Size</label>
+                        <input type="range" id="setting-beam" min="1" max="10" value="5" class="setting-range"
+                            oninput="this.nextElementSibling.textContent=this.value" onchange="applySettings()">
+                        <span>5</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>VAD Threshold</label>
+                        <input type="range" id="setting-vad" min="0.005" max="0.1" step="0.005" value="0.02"
+                            class="setting-range" oninput="this.nextElementSibling.textContent=this.value"
+                            onchange="applySettings()">
+                        <span>0.02</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>Silence Duration</label>
+                        <input type="range" id="setting-silence" min="0.5" max="5" step="0.1" value="1.5"
+                            class="setting-range" oninput="this.nextElementSibling.textContent=this.value + 's'"
+                            onchange="applySettings()">
+                        <span>1.5s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Info -->
+            <div class="card">
+                <h3>System</h3>
+                <div class="system-info">
+                    <span>Connections: <strong id="ws-status">Disconnected</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
 
     <script src="/static/app.js"></script>
 </body>

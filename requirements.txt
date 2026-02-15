@@ -4,3 +4,4 @@ piper-tts
 aiohttp
 aiohttp-cors
 numpy
+speechbrain

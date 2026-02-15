@@ -35,12 +35,12 @@ MODE = "transcribe"  # "transcribe" (Phase 1) or "dispatch" (Phase 2)
 
 
 # Voice Activity Detection
-VAD_ENERGY_THRESHOLD = 0.02  # RMS energy threshold to detect speech
-VAD_SILENCE_DURATION = 1.5   # Seconds of silence before utterance is considered complete
+VAD_ENERGY_THRESHOLD = 0.015  # RMS energy threshold to detect speech
+VAD_SILENCE_DURATION = 1.5    # Seconds of silence before utterance is considered complete
 VAD_MIN_SPEECH_DURATION = 0.5  # Minimum seconds of speech to trigger processing
 
 # Speech-to-Text (faster-whisper)
-WHISPER_MODEL = "medium.en"  # Options: tiny.en, base.en, small.en, medium.en, large-v3
+WHISPER_MODEL = "large-v3"   # Options: tiny.en, base.en, small.en, medium.en, large-v3
 WHISPER_DEVICE = "cpu"
 
 # LLM (Ollama)

@@ -21,7 +21,7 @@ class SpeechToText:
 
     def __init__(self):
         self._model = None
-        self._beam_size = 5
+        self._beam_size = 10
 
     def load(self):
         """Load the Whisper model. First run downloads the model."""
